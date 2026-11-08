@@ -1,8 +1,16 @@
 # CommerceETLAV InfraGate
 
-> **Status:** Approved MVP design specification — not a claim of implemented functionality.  
-> **Repository:** [commerce-etlav-infra-gateway](https://github.com/orbartal/commerce-etlav-infra-gateway)  
-> **Read this overview first.** The two adapter specifications may then be read in either order.
+## Table of Contents
+
+- [1. Purpose](#purpose)
+- [2. Documentation](#documentation)
+- [3. MVP Boundaries](#mvp-boundaries)
+- [4. Shared Standards](#shared-standards)
+- [5. Data Preparation](#data-preparation)
+- [6. Error Response](#error-response)
+- [7. Tester Integration](#tester-integration)
+- [8. Implementation](#implementation)
+
 
 ## 1. Purpose
 
@@ -23,8 +31,8 @@ InfraGate is **one Java/Spring Boot microservice** with **one dedicated PostgreS
 
 | Document | Contents |
 |---|---|
-| [Kafka adapter](docs/infra_gate_kafka_v3.0.md) | Topic management, Kafka preparation, indexing, event lookup, and Kafka-specific failures |
-| [MinIO adapter](docs/infra_gate_minio_v3.0.md) | Bucket/dataset management, MinIO preparation, indexing, event lookup, and MinIO-specific failures |
+| [Kafka adapter](docs/infra-gate-kafka.md) | Topic management, Kafka preparation, indexing, event lookup, and Kafka-specific failures |
+| [MinIO adapter](docs/infra-gate-minio.md) | Bucket/dataset management, MinIO preparation, indexing, event lookup, and MinIO-specific failures |
 
 This README defines the **shared contract**. Each adapter document defines its implementation details. The [Tester README](https://github.com/orbartal/commerce-etlav-tester/blob/main/README.md) is authoritative for the first E2E scenario; adapter documents contain summaries only.
 
@@ -38,7 +46,7 @@ This README defines the **shared contract**. Each adapter document defines its i
 - One global preparation at a time, across **both** adapters; no distributed coordination or multi-instance deployment.
 - HTTP requests are synchronous. `POST /prepare` starts an **asynchronous worker** and returns `202 Accepted` without a body. Tester polls status.
 
-## 4. Shared Event-Reading Standard
+## 4. Shared Standards
 
 ### 4.1 Adapter base paths
 
@@ -74,7 +82,7 @@ Both event endpoints use **zero-based** `index`, a maximum `size` of **1000**, a
 - An unknown `eventId` returns `404 EVENT_NOT_FOUND`, **not** an empty successful details response.
 - Both summary and details require successful preparation (`READY`).
 
-### 4.2 Shared event-details shape
+### 4.2 Event standards
 
 Each details item contains exactly four top-level fields:
 
@@ -104,7 +112,7 @@ Kafka's index stores **one row per message**, with a non-unique `eventId`. Summa
 
 MinIO stores `{datasetId}/{eventId}.json`, so repeated writes overwrite the same object. A details query normally returns one item, but still uses the **same pagination contract**. Tester compares distinct IDs and payloads, while validating expected Kafka duplicate counts separately.
 
-## 5. Preparation and Global Coordination
+## 5. Data Preparation
 
 Each adapter builds its own PostgreSQL lookup index in a background preparation task. Both use `NOT_PREPARED`, `BUILDING`, `READY`, and `FAILED`. Only `READY` permits event reads. Invalid JSON or missing/invalid required event identifiers fail preparation; partial indexes must never be exposed.
 
@@ -112,7 +120,7 @@ A **single shared preparation coordinator** permits at most **one active prepara
 
 Tester prepares Kafka and MinIO **sequentially**. The coordinator is shared; adapter-specific preparation logic and SQL tables remain independent.
 
-## 6. Errors and Consistency
+## 6. Error Response
 
 Common error response:
 
@@ -139,14 +147,27 @@ Adapter-specific codes (such as `TOPIC_NOT_FOUND` and `BUCKET_NOT_FOUND`) are al
 
 ## 7. Tester Integration
 
-The first MVP test obtains Generator's fixed `datasetId`, stops processing, cleans the test Kafka topic and MinIO dataset, enables Ingestor, triggers Generator, waits for processing, then stops Generator and Ingestor. Tester prepares each adapter **in sequence**, polls for `READY`, pages through IDs and details, and compares event identity and original payload. It checks expected Kafka duplicates and the MinIO overwrite model. Reports are generated and test data is preserved for debugging; the next test cleans it during setup.
+Below description of the first MVP test steps in Tester:
+1. The first MVP test obtains Generator's fixed datasetId.
+2. Stops events processing in Generator and Ingestor.
+3. Cleans the test Kafka topic and MinIO dataset.
+4. Enables Generator and Ingestor again.
+5. Triggers Generator to create and publish events.
+6. Waits 5 min for events processing to complete.
+7. Stops events processing in Generator and Ingestor.
+8. Tester prepares each adapter in InfraGate Kafka and MinIO.
+9. Tester pages through events IDs and details in Kafka and MinIO.
+10. Compares event identity and original payload between Kafka and MinIO.
+11. Tester checks expected Kafka duplicates and the MinIO overwrite model
+12. Tester reports are generated and test data is preserved for debugging.
 
 **The Tester README owns the authoritative step-by-step scenario.** See the two adapter documents for API-specific integration details.
 
-## 8. Implementation Notes
+## 8. Implementation
 
-- Java 27, Spring Boot 4, Maven, Docker Compose, PostgreSQL, lightweight SQL access and OpenAPI.
-- Kafka uses the Apache Kafka Java clients; MinIO uses AWS SDK for Java v2 S3 APIs.
-- Schema migrations should be reproducible; each adapter owns its own tables.
-- No service is claimed to be implemented merely because its specification is approved.
-- Both adapter documents remain draft specifications subject to polish and cross-repository alignment.
+- InfraGate is a microservice inside docker running with Docker Compose.
+- The microservice own its DB and each of its two parts (Kafka and MinIO).
+- Java 27, Spring Boot 4, Maven, PostgreSQL, lightweight SQL access and OpenAPI.
+- Kafka uses the Apache Kafka Java clients.
+- MinIO uses AWS SDK for Java v2 S3 APIs.
+- SQL DB schema migrations is reproducible using a script.
