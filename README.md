@@ -1,5 +1,10 @@
 # CommerceETLAV InfraGate
 
+[← CommerceETLAV Manager](https://github.com/orbartal/commerce-etlav-manager)
+
+InfraGate provide Rest API access to commerce-etlav infra services: Kafka and MinIO. 
+InfraGate is used by [Tester](https://github.com/orbartal/commerce-etlav-tester) as adapter for infra components.
+
 ## Table of Contents
 
 - [1. Purpose](#1-purpose)
