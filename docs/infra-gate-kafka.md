@@ -8,7 +8,7 @@ InfraGate exposes a small, consistent REST interface for CommerceETLAV Tester. T
 
 ### Shared event-reading contract (approved MVP)
 
-The [main InfraGate README](../README_v3.0.md) defines the common API standard. Both adapters expose:
+The [main InfraGate README](../README.md) defines the common API standard. Both adapters expose:
 
 - `GET /events/summary/all?index=0&size=100` — ordered event ID strings, including Kafka duplicates.
 - `GET /events/details/eventid/{eventId}?index=0&size=10` — paginated normalized full events matching `eventId`.
