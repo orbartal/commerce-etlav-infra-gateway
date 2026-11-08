@@ -1,9 +1,8 @@
-# InfraGate Kafka — Adapter Specification
+# InfraGate Kafka
 
-> **Document:** `docs/infra_gate_kafka_v3.0.md`  
-> **Status:** Approved MVP design specification (not a claim of implemented functionality)  
-> **Repository:** [commerce-etlav-infra-gateway](https://github.com/orbartal/commerce-etlav-infra-gateway)  
-> **Scope:** Kafka adapter within a unified InfraGate microservice. Read the [main README](../README_v3.0.md) first; the [MinIO adapter](infra_gate_minio_v3.0.md) is independent.
+[← CommerceETLAV Manager](https://github.com/orbartal/commerce-etlav-manager)
+
+[← CommerceETLAV InfraGate](https://github.com/orbartal/commerce-etlav-infra-gateway)
 
 InfraGate exposes a small, consistent REST interface for CommerceETLAV Tester. The Kafka adapter translates synchronous HTTP requests into Kafka administrative, inspection, and read operations. A background **prepare** task builds a PostgreSQL index so Tester can use conventional page indices rather than Kafka offsets or cursor APIs.
 

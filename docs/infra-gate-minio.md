@@ -1,9 +1,8 @@
 # InfraGate MinIO — Adapter Specification
 
-**Document:** InfraGate MinIO README v1  
-**Project:** CommerceETLAV  
-**Status:** Approved MVP design specification  
-**Scope:** MinIO adapter only; independent of any other InfraGate adapter
+[← CommerceETLAV Manager](https://github.com/orbartal/commerce-etlav-manager)
+
+[← CommerceETLAV InfraGate](https://github.com/orbartal/commerce-etlav-infra-gateway)
 
 ### Shared event-reading contract (approved MVP)
 
