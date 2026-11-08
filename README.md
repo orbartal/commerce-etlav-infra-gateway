@@ -2,14 +2,14 @@
 
 ## Table of Contents
 
-- [1. Purpose](#purpose)
-- [2. Documentation](#documentation)
-- [3. MVP Boundaries](#mvp-boundaries)
-- [4. Shared Standards](#shared-standards)
-- [5. Data Preparation](#data-preparation)
-- [6. Error Response](#error-response)
-- [7. Tester Integration](#tester-integration)
-- [8. Implementation](#implementation)
+- [1. Purpose](#1-purpose)
+- [2. Documentation](#2-documentation)
+- [3. MVP Boundaries](#3-mvp-boundaries)
+- [4. Shared Standards](#4-shared-standards)
+- [5. Data Preparation](#5-data-preparation)
+- [6. Error Response](#6-error-response)
+- [7. Tester Integration](#7-tester-integration)
+- [8. Implementation](#8-implementation)
 
 
 ## 1. Purpose
