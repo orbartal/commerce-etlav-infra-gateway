@@ -256,7 +256,24 @@ Preparation is asynchronous and has a **separate configurable worker timeout**, 
 
 ### Snapshot constraint
 
-Once preparation starts, **no new or modified dataset objects may be written** until Tester finishes using the prepared pages. InfraGate does not automatically detect external MinIO changes. Document this constraint in OpenAPI/Swagger as well as this README. Later versions may disable events at task/dataset scope rather than globally stopping Generator and Ingestor.
+Tester must stop Generator and Ingestor before preparation
+and keep the dataset unchanged until validation completes.
+
+InfraGate does not continuously monitor MinIO for external changes.
+
+For MVP, InfraGate detects changes only when they are observable
+during its own operations, such as a missing indexed object
+during event-details retrieval.
+
+When InfraGate detects an unexpected change:
+- Mark the affected preparation as FAILED.
+- Reject further event reads.
+- Return 409 INDEX_OUT_OF_DATE for the detecting request.
+- Tester fails the test.
+
+Undetected external changes are outside the MVP guarantees.
+Tester is responsible for ensuring dataset stability.
+
 
 ## 7. PostgreSQL Data Model
 
